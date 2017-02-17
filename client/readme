@@ -1,0 +1,4 @@
+using client-arg 
+
+go run client-arg.go -runcommand=runlogin jpj arg3
+go run client-arg.go -runcommand=fileupload 779d6df7-8f00-4949-901b-e1d9c97525d9

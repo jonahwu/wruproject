@@ -1,0 +1,39 @@
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+type gpslocation struct {
+	lati float64
+	long float64
+}
+
+func gpsloc() {
+	fmt.Println("into gpsloc")
+	gg := gpslocation{}
+	gg.lati = 23.3333333
+	gg.long = 123.333333
+	step := 0.0001
+	dist := 0.002
+	gpsx := gg.lati
+	gpsy := gg.lati
+	distx := 0.0
+	disty := 0.0
+	direct := 1.0
+	for {
+		distx = distx + step*direct
+		disty = disty + step*direct
+		gpsx = gg.lati + distx
+		gpsy = gg.lati + disty
+		fmt.Println("gpsloc", gpsx, gpsy)
+		if distx > dist {
+			direct = direct * -1
+		}
+		if distx <= 0 {
+			direct = direct * -1
+		}
+		time.Sleep(time.Second * 1)
+	}
+}
