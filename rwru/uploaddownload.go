@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 	//"time"
 	//	"bufio"
@@ -224,6 +225,21 @@ func middlewareGenerator(foo, foo2 string) (mw func(http.Handler) http.Handler) 
 	return
 }
 
+func setGpsLocHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("into gps loc handler")
+	gpsloc := gpslocation{}
+	gpsloc.lati, _ = strconv.ParseFloat(r.Header.Get("lati"), 64)
+	gpsloc.long, _ = strconv.ParseFloat(r.Header.Get("long"), 64)
+	token := r.Header.Get("Auth-Token")
+	as, _ := setGpsLoc(kAPI, token, gpsloc)
+	fmt.Println("the http token:", as)
+	//a := map[string]interface{}{}
+	//a["auth-token"] = as
+	//jsonString, _ := json.Marshal(a)
+	//w.Write(jsonString)
+
+}
+
 func startWeb() {
 	commonHandlers := alice.New(loggingHandler, tokenHandler, middlewareGenerator("foo", "foo2"))
 	router := httprouter.New()
@@ -232,6 +248,7 @@ func startWeb() {
 	router.GET("/download", wrapHandler(commonHandlers.ThenFunc(webDownloadHandler)))
 	router.POST("/adduser", addUserHandler)
 	router.GET("/login", authLoginHandler)
+	router.POST("/setgpsloc", wrapHandler(commonHandlers.ThenFunc(setGpsLocHandler)))
 
 	aa := "strrrrr"
 	router.GET("/tt", ttHandler(aa))

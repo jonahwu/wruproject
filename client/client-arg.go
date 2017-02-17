@@ -133,6 +133,11 @@ func main() {
 
 	case "gpsloc":
 		fmt.Println("gpsloc")
-		gpsloc()
+		if len(flag.Args()) != 1 {
+			fmt.Println("not enough argv")
+			os.Exit(3)
+		}
+		token := flag.Arg(0)
+		gpsloc(token)
 	}
 }

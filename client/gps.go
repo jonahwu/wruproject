@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -57,12 +58,27 @@ func gencalllinearloc(ggloc chan gpslocation) gpslocation {
 	return <-ggloc
 }
 
-func gpsloc() {
+func gpsloc(token string) {
 	ggloc := make(chan gpslocation)
 	ggloc = callinearloc()
 	for {
 		gpsloc := gencalllinearloc(ggloc)
 		fmt.Println("the gpslocation is ", gpsloc.lati, gpsloc.long)
+		setgpsloc(token, gpsloc)
 		time.Sleep(time.Second * 1)
+
 	}
+}
+
+func setgpsloc(token string, gpsloc gpslocation) {
+	url := "http://localhost:8080/setgpsloc"
+	request, _ := http.NewRequest("POST", url, nil)
+	userToken := token
+	request.Header.Set("Auth-Token", userToken)
+	request.Header.Set("lati", fmt.Sprintf("%s", gpsloc.lati))
+	request.Header.Set("long", fmt.Sprintf("%s", gpsloc.long))
+
+	resp, _ := http.DefaultClient.Do(request)
+	fmt.Println(resp)
+	fmt.Println(resp.StatusCode)
 }
