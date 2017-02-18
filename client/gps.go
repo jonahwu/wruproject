@@ -75,8 +75,8 @@ func setgpsloc(token string, gpsloc gpslocation) {
 	request, _ := http.NewRequest("POST", url, nil)
 	userToken := token
 	request.Header.Set("Auth-Token", userToken)
-	request.Header.Set("lati", fmt.Sprintf("%s", gpsloc.lati))
-	request.Header.Set("long", fmt.Sprintf("%s", gpsloc.long))
+	request.Header.Set("lati", fmt.Sprintf("%f", gpsloc.lati))
+	request.Header.Set("long", fmt.Sprintf("%f", gpsloc.long))
 
 	resp, _ := http.DefaultClient.Do(request)
 	fmt.Println(resp)
