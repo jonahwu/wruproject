@@ -69,13 +69,40 @@ func setToken(kAPI client.KeysAPI, username string) (string, error) {
 	token1 := tokenDir + token
 	fmt.Println("into setToken", username)
 	var ss = client.SetOptions{TTL: time.Duration(100000 * time.Hour)}
-	_, err := kAPI.Set(context.Background(), token1, token, &ss)
+	//todo: set the following token as username, means we store token in key and store userinfo in value
+	//_, err := kAPI.Set(context.Background(), token1, token, &ss)
+	_, err := kAPI.Set(context.Background(), token1, username, &ss)
 	if err != nil {
 		fmt.Println("set error")
 	}
 	res, err := kAPI.Get(context.Background(), token1, nil)
 	fmt.Println(res.Node.Value)
 	return token, nil
+
+}
+func getNameFromToken(token string) (string, error) {
+	token1 := tokenDir + token
+	res, err := kAPI.Get(context.Background(), token1, nil)
+	if err != nil {
+		return "", err
+	}
+	username := res.Node.Value
+	fmt.Println("getNameFromToken", res.Node.Value)
+	return username, nil
+}
+
+func getToken(kAPI client.KeysAPI, user string) (string, error) {
+	fmt.Println("go to checkUser")
+	userpath := fmt.Sprintf("/user/%s", user)
+	res, err := kAPI.Get(context.Background(), userpath, nil)
+	value, _ := getValueResponse(res)
+	return value, nil
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println(err)
+		return value, err
+	}
+	return value, nil
 
 }
 
@@ -108,21 +135,6 @@ func checkUserExisted(kAPI client.KeysAPI, user string, password string) error {
 
 }
 
-func getToken(kAPI client.KeysAPI, user string) (string, error) {
-	fmt.Println("go to checkUser")
-	userpath := fmt.Sprintf("/user/%s", user)
-	res, err := kAPI.Get(context.Background(), userpath, nil)
-	value, _ := getValueResponse(res)
-	return value, nil
-	fmt.Println(res)
-	if err != nil {
-		fmt.Println(err)
-		return value, err
-	}
-	return value, nil
-
-}
-
 func connectETCD(ip string) (client.KeysAPI, error) {
 	fmt.Println("start to connect")
 	target := fmt.Sprintf("http://%s:2379", ip)
@@ -143,10 +155,11 @@ func connectETCD(ip string) (client.KeysAPI, error) {
 func setGpsLoc(kAPI client.KeysAPI, token string, gpsloc gpslocation) (string, error) {
 	//username = "lala"
 	//token := uuid.New()
-	username := "kala"
+	//username := "kala"
+	username, _ := getNameFromToken(token)
 	gpsDir1 := gpsDir + username
 	fmt.Println("into setToken", username)
-	var ss = client.SetOptions{TTL: time.Duration(10 * time.Second)}
+	var ss = client.SetOptions{TTL: time.Duration(100 * time.Hour)}
 	strgpsloc := fmt.Sprintf("%f//%f", gpsloc.lati, gpsloc.long)
 	_, err := kAPI.Set(context.Background(), gpsDir1, strgpsloc, &ss)
 	if err != nil {
