@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Unknwon/goconfig"
 	"github.com/coreos/etcd/client"
 	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
@@ -12,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	//"time"
 	//	"bufio"
@@ -19,6 +21,7 @@ import (
 )
 
 var kAPI client.KeysAPI
+var cfg *goconfig.ConfigFile
 
 func checkErr(err error) {
 	if err != nil {
@@ -35,6 +38,10 @@ func init() {
 	if err != nil {
 		fmt.Println("data file existed")
 	}
+
+	cfg, _ = goconfig.LoadConfigFile("/etc/wru/conf.ini")
+	_, _ = cfg.MustValueSet("gps", "expiretime", "99999")
+	_, _ = cfg.MustValueSet("token", "expiretime", "99999")
 }
 
 //curl -v -X POST -N --data-binary @"./haproxy.cfg" http://localhost:8080/webUploadHandler
@@ -240,6 +247,21 @@ func setGpsLocHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetGpsLocHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("into gps loc handler")
+	//token := r.Header.Get("Auth-Token")
+	userid := string(r.Header.Get("clientuserid"))
+	clientgpsloc, _ := GetGpsLoc(kAPI, userid)
+	fmt.Println("the client gps location", clientgpsloc)
+	loc := strings.Split(clientgpsloc, "//")
+	w.Header().Set("lati", loc[0])
+	w.Header().Set("long", loc[1])
+	//a := map[string]interface{}{}
+	//a["auth-token"] = as
+	//jsonString, _ := json.Marshal(a)
+	//w.Write(jsonString)
+
+}
 func startWeb() {
 	commonHandlers := alice.New(loggingHandler, tokenHandler, middlewareGenerator("foo", "foo2"))
 	router := httprouter.New()
@@ -249,6 +271,7 @@ func startWeb() {
 	router.POST("/adduser", addUserHandler)
 	router.GET("/login", authLoginHandler)
 	router.POST("/setgpsloc", wrapHandler(commonHandlers.ThenFunc(setGpsLocHandler)))
+	router.GET("/getgpsloc", wrapHandler(commonHandlers.ThenFunc(GetGpsLocHandler)))
 
 	aa := "strrrrr"
 	router.GET("/tt", ttHandler(aa))

@@ -43,7 +43,8 @@ func createUser(kAPI client.KeysAPI, user string, password string) error {
 	//_, err = kAPI.Create(context.Background(), tokenDir, passwordToken)
 	passwordToken := uuid.New()
 	fmt.Println("print token:", passwordToken)
-	expireTime := client.CreateInOrderOptions{TTL: time.Duration(time.Second * 10)}
+	sec, _ := cfg.Int64("token", "expiretime")
+	expireTime := client.CreateInOrderOptions{TTL: time.Duration(time.Second * time.Duration(sec))}
 	_, err = kAPI.CreateInOrder(context.Background(), tokenDir+passwordToken, passwordToken, &expireTime)
 	if err != nil {
 		fmt.Println("error to create Token")
@@ -138,12 +139,12 @@ func checkUserExisted(kAPI client.KeysAPI, user string, password string) error {
 func connectETCD(ip string) (client.KeysAPI, error) {
 	fmt.Println("start to connect")
 	target := fmt.Sprintf("http://%s:2379", ip)
-	cfg := client.Config{
+	cfgetcd := client.Config{
 		Endpoints: []string{target},
 		//Endpoints: []string{"http://127.0.0.1:2379"},
 		//Transport: DefaultTransport,
 	}
-	c, err := client.New(cfg)
+	c, err := client.New(cfgetcd)
 	if err != nil {
 		// handle error
 	}
@@ -159,7 +160,8 @@ func setGpsLoc(kAPI client.KeysAPI, token string, gpsloc gpslocation) (string, e
 	username, _ := getNameFromToken(token)
 	gpsDir1 := gpsDir + username
 	fmt.Println("into setToken", username)
-	var ss = client.SetOptions{TTL: time.Duration(100 * time.Hour)}
+	sec, _ := cfg.Int64("gps", "expiretime")
+	var ss = client.SetOptions{TTL: time.Duration(time.Duration(sec) * time.Hour)}
 	strgpsloc := fmt.Sprintf("%f//%f", gpsloc.lati, gpsloc.long)
 	_, err := kAPI.Set(context.Background(), gpsDir1, strgpsloc, &ss)
 	if err != nil {
@@ -167,6 +169,22 @@ func setGpsLoc(kAPI client.KeysAPI, token string, gpsloc gpslocation) (string, e
 	}
 	res, err := kAPI.Get(context.Background(), gpsDir1, nil)
 	fmt.Println(res.Node.Value)
+	return strgpsloc, nil
+}
+
+func GetGpsLoc(kAPI client.KeysAPI, clientuserid string) (string, error) {
+	//username = "lala"
+	//token := uuid.New()
+	//username := "kala"
+	//username, _ := getNameFromToken(token)
+	gpsDir1 := gpsDir + clientuserid
+
+	res, err := kAPI.Get(context.Background(), gpsDir1, nil)
+	if err != nil {
+		fmt.Println("set error")
+	}
+	//fmt.Println(res.Node.Value)
+	strgpsloc := string(res.Node.Value)
 	return strgpsloc, nil
 }
 
