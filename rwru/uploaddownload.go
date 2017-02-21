@@ -262,6 +262,16 @@ func GetGpsLocHandler(w http.ResponseWriter, r *http.Request) {
 	//w.Write(jsonString)
 
 }
+
+func GetUserIDHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("into gps loc handler")
+	//token := r.Header.Get("Auth-Token")
+	username := string(r.Header.Get("username"))
+	password := string(r.Header.Get("password"))
+	userid, _ := GetUserID(kAPI, username, password)
+	fmt.Println("the client gps location", userid)
+	w.Header().Set("userid", userid)
+}
 func startWeb() {
 	commonHandlers := alice.New(loggingHandler, tokenHandler, middlewareGenerator("foo", "foo2"))
 	router := httprouter.New()
@@ -272,6 +282,7 @@ func startWeb() {
 	router.GET("/login", authLoginHandler)
 	router.POST("/setgpsloc", wrapHandler(commonHandlers.ThenFunc(setGpsLocHandler)))
 	router.GET("/getgpsloc", wrapHandler(commonHandlers.ThenFunc(GetGpsLocHandler)))
+	router.GET("/getuserid", wrapHandler(commonHandlers.ThenFunc(GetUserIDHandler)))
 
 	aa := "strrrrr"
 	router.GET("/tt", ttHandler(aa))
