@@ -160,6 +160,7 @@ func getInfoHandler(w http.ResponseWriter, r *http.Request) {
 	jsonString, _ := json.Marshal(a)
 	//w.WriteHeader(200)
 	w.Write(jsonString)
+
 }
 
 func getInfoHandler1(str string) http.HandlerFunc {
@@ -266,11 +267,31 @@ func GetGpsLocHandler(w http.ResponseWriter, r *http.Request) {
 func GetUserIDHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("into gps loc handler")
 	//token := r.Header.Get("Auth-Token")
+	// the following is for general used
+	var params httprouter.Params
+	if ps := context.Get(r, "params"); ps != nil {
+		params = ps.(httprouter.Params) // this is part I hate about gorilla
+	}
+	fmt.Println("userid para", params.ByName("name"))
+	// the above is for general used
+
 	username := string(r.Header.Get("username"))
 	password := string(r.Header.Get("password"))
 	userid, _ := GetUserID(kAPI, username, password)
 	fmt.Println("the client gps location", userid)
 	w.Header().Set("userid", userid)
+}
+
+func GetUserINFOHandler(w http.ResponseWriter, r *http.Request) {
+	//token := r.Header.Get("Auth-Token")
+	// the following is for general used
+	var params httprouter.Params
+	if ps := context.Get(r, "params"); ps != nil {
+		params = ps.(httprouter.Params) // this is part I hate about gorilla
+	}
+	fmt.Println("userinfo para", params.ByName("info"))
+	// the above is for general used
+
 }
 func startWeb() {
 	commonHandlers := alice.New(loggingHandler, tokenHandler, middlewareGenerator("foo", "foo2"))
@@ -283,6 +304,7 @@ func startWeb() {
 	router.POST("/setgpsloc", wrapHandler(commonHandlers.ThenFunc(setGpsLocHandler)))
 	router.GET("/getgpsloc", wrapHandler(commonHandlers.ThenFunc(GetGpsLocHandler)))
 	router.GET("/getuserid", wrapHandler(commonHandlers.ThenFunc(GetUserIDHandler)))
+	router.GET("/getuserinfo/:info", wrapHandler(commonHandlers.ThenFunc(GetUserINFOHandler)))
 
 	aa := "strrrrr"
 	router.GET("/tt", ttHandler(aa))
