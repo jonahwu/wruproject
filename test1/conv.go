@@ -189,12 +189,12 @@ func main() {
 	fmt.Println("result", ii, reflect.TypeOf(ii))
 	fmt.Println("----------  running charlist to string ------------")
 	//	ss := "aaaaaa"
-	c := []byte("Here is a byte list....")
+	c := []byte("3.1415")
 	cc := Convert(c, "string")
 	fmt.Println("result", cc, reflect.TypeOf(cc))
 
 	fmt.Println("----------  running string to string ------------")
-	s := "Here is a string...."
+	s := "3.1415"
 	ss := Convert(s, "string")
 	fmt.Println("result", ss, reflect.TypeOf(ss))
 
@@ -215,17 +215,17 @@ func main() {
 	fmt.Println(iiii, reflect.TypeOf(iiii))
 
 	fmt.Println("----------bytelist to int  ------------")
-	ccc := []byte("Here is a byte list....")
+	ccc := []byte("3.1415")
 	iccc := Convert(ccc, "int64")
 	fmt.Println(iccc, reflect.TypeOf(iccc))
 
 	fmt.Println("----------string to int  ------------")
-	sti := "Here is a byte list...."
+	sti := "3.1415"
 	isti := Convert(sti, "int64")
 	fmt.Println(isti, reflect.TypeOf(isti))
 
 	fmt.Println("----------string to float  ------------")
-	stf := "Here is a byte list...."
+	stf := "3.1415"
 	sstf := Convert(stf, "float64")
 	fmt.Println(sstf, reflect.TypeOf(sstf))
 
@@ -237,7 +237,7 @@ func main() {
 	fmt.Println(iitf, reflect.TypeOf(iitf))
 
 	fmt.Println("----------bytelist to float  ------------")
-	btf := []byte("Here is a byte list....")
+	btf := []byte("3.1415")
 	bbtf := Convert(btf, "float64")
 	fmt.Println(bbtf, reflect.TypeOf(bbtf))
 
