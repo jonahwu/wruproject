@@ -98,7 +98,7 @@ func setToken(kAPI client.KeysAPI, username string) (string, error) {
 	//username = "lala"
 	token := uuid.New()
 	token1 := tokenDir + token
-	userID, _ := getUserInfo(kAPI, username, "userID")
+	userID, _ := getUserInfo(kAPI, username, "userid")
 	fmt.Println("into setToken", username)
 	var ss = client.SetOptions{TTL: time.Duration(100000 * time.Hour)}
 	//todo: set the following token as username, means we store token in key and store userinfo in value

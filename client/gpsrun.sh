@@ -1,5 +1,5 @@
 #go run client-arg.go gps.go -runcommand gpsloc 3cd59439-98cf-4548-ba54-cb263f965dc7
-
+#go run client-arg.go gps.go -runcommand=createuser mindy haha
 #go run client-arg.go gps.go -runcommand=runlogin mindy haha
 # now the expred time has been changed to infinity
 
