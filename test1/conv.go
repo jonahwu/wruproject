@@ -121,6 +121,17 @@ func DetectType(aa interface{}) string {
 	return fmt.Sprintf("%v", reflect.TypeOf(aa))
 }
 
+func ConvertToString(in interface{}) string {
+	inputtype := DetectType(in)
+	if inputtype == "float64" {
+		ft := FloatTo{}
+		ft.f = in.(float64)
+		ret := ConvertTo(ft, "string")
+		return ret.(string)
+	}
+	return ""
+}
+
 func Convert(in interface{}, convtype string) interface{} {
 	//ConvertTo()
 	//transfer.ToString()
@@ -245,5 +256,9 @@ func main() {
 	ftf := 3.14159
 	fftf := Convert(ftf, "float64")
 	fmt.Println(fftf, reflect.TypeOf(fftf))
-
+	fmt.Println("-------------------------------------")
+	fmt.Println("----------ConvertToString test---------------------")
+	cf := 3.1515
+	scf := ConvertToString(cf)
+	fmt.Println(scf + "aaa")
 }
